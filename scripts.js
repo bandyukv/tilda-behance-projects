@@ -1,0 +1,41 @@
+document.addEventListener('DOMContentLoaded', function() {
+  function loadBehanceProjects() {
+    var apiKey = '1dcb0a4e7d0e45cb890d08b4a772998a';
+    var url = `https://api.allorigins.win/get?url=${encodeURIComponent('https://api.behance.net/v2/projects?sort=appreciations&per_page=6&api_key=' + apiKey)}`;
+
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(data => {
+        var projects = JSON.parse(data.contents).projects;
+        displayProjects(projects);
+      })
+      .catch(error => {
+        console.error('Ошибка загрузки данных с Behance API:', error);
+      });
+  }
+
+  function displayProjects(projects) {
+    var projectsContainer = document.getElementById('projects-container');
+    projectsContainer.innerHTML = ''; // Очищаем контейнер перед добавлением новых проектов
+
+    projects.forEach(project => {
+      var projectHTML = `
+        <div class="project-card">
+          <a href="${project.url}" target="_blank">
+            <img src="${project.covers.original || project.covers[404] || project.covers[202] || project.covers[230]}" alt="${project.name}">
+            <h3>${project.name}</h3>
+            <p>${project.fields.join(', ')}</p>
+          </a>
+        </div>
+      `;
+      projectsContainer.innerHTML += projectHTML;
+    });
+  }
+
+  loadBehanceProjects();
+});
